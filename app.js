@@ -60,7 +60,16 @@ app.use((error, req, res, next) => {
 app.use('/graphql', graphqlHTTP({
   schema: graphqlSchema,
   rootValue: graphqlResolvers,
-  graphiql: true
+  graphiql: true,
+  formatError(err) {
+    if (!err.originalError) {
+      return err;
+    }
+    const { data, code } = err.originalError;
+    const msg = err.message || 'An error occurred!';
+    const status = code || 500;
+    return { message: msg, status, data };
+  }
 }))
 
 mongoose
