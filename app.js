@@ -5,10 +5,12 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
 
-const graphqlSchema = require('./graphql/schema');
-const graphqlResolvers = require('./graphql/resolvers');
 const { createHandler } = require('graphql-http');
 const { graphqlHTTP } = require('express-graphql');
+
+const graphqlSchema = require('./graphql/schema');
+const graphqlResolvers = require('./graphql/resolvers');
+const auth = require('./middleware/is-auth');
 
 const app = express();
 
@@ -53,13 +55,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use((error, req, res, next) => {
-  console.log(error);
-  const status = error.statusCode || 500;
-  const message = error.message;
-  const data = error.data;
-  res.status(status).json({ message: message, data: data });
-});
+app.use(auth)
 
 app.use('/graphql', graphqlHTTP({
   schema: graphqlSchema,

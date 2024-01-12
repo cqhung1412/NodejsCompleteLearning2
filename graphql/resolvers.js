@@ -56,24 +56,21 @@ module.exports = {
     return { token, userId: user._id.toString() }
   },
   createPost: async function ({ postInput, token }, req) {
-    console.log(postInput)
-    const tokenContent = jwt.decode(token)
-    const user = await User.findById(tokenContent.userId)
-    if (!user) {
+    if (!req.isAuth) {
       const error = new Error('Unauthorized!')
       error.code = 401
       throw error
     }
     const post = await Post.create({
       ...postInput,
-      creator: user._id
+      creator: req.userId
     })
     if (!post) {
       const error = new Error('Unable to create post!')
       error.code = 500
       throw error
     }
-    await User.updateOne({ _id: user._id }, { "$push": { "posts": post._id } })
+    await User.updateOne({ _id: req.userId }, { "$push": { "posts": post._id } })
     const result = await Post.findById(post._id).populate("creator");
     console.log(result)
     return result

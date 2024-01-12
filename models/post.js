@@ -5,14 +5,16 @@ const postSchema = new Schema(
   {
     title: {
       type: String,
-      required: true
+      required: true,
+      minlength: 5
     },
     imageUrl: {
       type: String
     },
     content: {
       type: String,
-      required: true
+      required: true,
+      minlength: 5
     },
     creator: {
       type: Schema.Types.ObjectId,
