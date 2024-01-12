@@ -4,10 +4,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const multer = require('multer');
-const { graphqlHTTP } = require('express-graphql');
 
 const graphqlSchema = require('./graphql/schema');
 const graphqlResolvers = require('./graphql/resolvers');
+const { createHandler } = require('graphql-http');
+const { graphqlHTTP } = require('express-graphql');
 
 const app = express();
 
@@ -64,7 +65,7 @@ app.use('/graphql', graphqlHTTP({
   schema: graphqlSchema,
   rootValue: graphqlResolvers,
   graphiql: true,
-  formatError(err) {
+  customFormatErrorFn(err) {
     if (!err.originalError) {
       return err;
     }
@@ -77,7 +78,9 @@ app.use('/graphql', graphqlHTTP({
 
 mongoose
   .connect(
-    'mongodb+srv://cqhung1412:jaVFccX3gHd47Qh4@nodejs-cluster0.pvske.mongodb.net/messages?retryWrites=true&w=majority'
+    'mongodb://user:pass@localhost:27017?retryWrites=true&w=majority',
+    { useNewUrlParser: true, useUnifiedTopology: true }
   )
   .then(result => app.listen(8080))
+  .then(res => console.log("App listens on 8080"))
   .catch(err => console.log(err));
